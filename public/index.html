@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <ul class="pages">
+        <li class="chatPage">
+            <div class="chatArea">
+                <ul class="messagesBox">
+
+                </ul>
+            </div>
+            <form id="chatForm">
+                <input class="inputMessage"type="text" name="message" autocomplete="off" placeholder="Digite sua mensagem">
+                <button type="submit" style="display: none;">Enviar</button>   
+            </form>
+        </li>
+        <li class="loginPage">
+            <h1>Online Chat</h1>
+            <form id="chat-user">
+                <input type="text" class="inputMessage" name="username" autocomplete="off" placeholder="Digite seu nome">
+                <button type="submit" style="display: none;">Enviar</button>   
+            </form>
+        </li>
+    </ul>
+   
+    
+    <script type="text/javascript">
+        var socket = io();
+        var user
+        var colorMessage
+        var $chatPage = $('.chatPage')
+        var $loginPage = $('.loginPage')
+        
+
+        function renderMessage(message){
+            
+            $('.messagesBox').append('<li class="message"><strong style="color:'+ message.color + ';">'+ message.author +'   '+'</strong><p style="margin: 0;padding: 0 0 0 20px;">'+ message.message + '</p></li>')
+            
+        }
+        
+        socket.on('previusMessage',function(messages){
+            
+            for (message of messages){
+                
+                renderMessage(message)
+            }
+                
+        })
+        
+        socket.on('receivedMessage', function(message){
+            renderMessage(message)
+        })
+
+        socket.on('sendColor', function(color){
+            colorMessage = color
+            $loginPage.hide()
+            $chatPage.show() 
+        })
+
+        
+        $('#chat-user').submit(function(event){
+            event.preventDefault()
+            user = $('input[name=username]').val()
+            socket.emit('sendColor',user)
+            
+            
+        })
+        
+        $('#chatForm').submit(function(event){
+            event.preventDefault()
+
+            var message = $('input[name=message]').val()
+            $('input[name=message]').val("")
+            
+
+            if (message.length){
+                var messageObject = {
+                    message: message,
+                    author: user,
+                    color: colorMessage
+                }
+            }
+            
+            renderMessage(messageObject)
+
+            socket.emit('sendMessage',messageObject)
+        })
+    </script>
+</body>
+</html>
