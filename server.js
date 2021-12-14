@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 require("dotenv").config();
 const mongoose = require('mongoose')
+const cors = require('cors')
 const Color = require('./database/colorSchema')
 const Message = require('./database/messageSchema')
 
@@ -15,7 +16,7 @@ const app = express();
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
 
-
+app.use(cors())
 app.use(express.static(path.join(__dirname,'public')));
 app.set('views',path.join(__dirname,'public'));
 app.engine('html',require('ejs').renderFile);
