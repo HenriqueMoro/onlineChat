@@ -16,7 +16,7 @@
     <ul class="pages">
         <li class="chatPage">
             <div class="chatArea">
-                <ul class="messagesBox">
+                <ul class="messagesBox" id="scroll">
 
                 </ul>
             </div>
@@ -41,6 +41,8 @@
         var colorMessage
         var $chatPage = $('.chatPage')
         var $loginPage = $('.loginPage')
+        $('#scroll').scrollTop($('#scroll')[0].scrollHeight);
+        
         
 
         function renderMessage(message){
